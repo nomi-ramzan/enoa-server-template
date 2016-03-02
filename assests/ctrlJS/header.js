@@ -24,20 +24,20 @@ Utils.decodeToken = function(token, callback){
 
 module.exports.auth = function(req, res, next){
   try{
-    if( !req.headers || !req.headers.authorization ) return res.status(ENM.CODES.BAD).json({msg:MsgJS.INVALID_DATAS, data:{name:MsgJS.WORDS.CREDENTIALS}});
+    if( !req.headers || !req.headers.authorization ) return res.status(ENM.CODES.BAD).json({msg:"INVALID_DATAS"});
     var parts = req.headers.authorization.split(' ');
-    if(parts.length != 2 || !/^Bearer$/i.test(parts[0])) return res.status(ENM.CODES.BAD).json({msg:MsgJS.INVALID_DATAS, data:{name:MsgJS.WORDS.CREDENTIALS}});
+    if(parts.length != 2 || !/^Bearer$/i.test(parts[0])) return res.status(ENM.CODES.BAD).json({msg:"INVALID_DATAS"});
     var token = parts[1];
-    if(jws.verify(token, ENM.TOKEN.SECR.HEADER.alg, ENM.TOKEN.SECR.KEY) == false) return res.status(ENM.CODES.UN_AUTH).json({msg:MsgJS.INVALID_DATAS, data:{name:MsgJS.WORDS.CREDENTIALS}});
+    if(jws.verify(token, ENM.TOKEN.SECR.HEADER.alg, ENM.TOKEN.SECR.KEY) == false) return res.status(ENM.CODES.UN_AUTH).json({msg:"INVALID_DATAS"});
     req.user = Utils.decodeToken(token);
-    if(req.user.exp != undefined && req.user.exp < moment().format('x')) return res.status(ENM.CODES.UN_AUTH).json({msg:MsgJS.ERRORS.TOKEN_EXP});
+    if(req.user.exp != undefined && req.user.exp < moment().format('x')) return res.status(ENM.CODES.UN_AUTH).json({msg:"ERRORS"});
     next();
   }catch(e){ return sendError(e, res); }
 }
 module.exports.rolToken = function(req, res, next){
   try{
     var token = req.body.token || req.query.token || req.params.token || "";
-    if(jws.verify(token, ENM.TOKEN.SECR.HEADER.alg, ENM.TOKEN.SECR.KEY) == false) return res.status(ENM.CODES.BAD).json({msg:MsgJS.TOKEN_INVALID_MSG});
+    if(jws.verify(token, ENM.TOKEN.SECR.HEADER.alg, ENM.TOKEN.SECR.KEY) == false) return res.status(ENM.CODES.BAD).json({msg:"TOKEN_INVALID_MSG"});
     if(token.indexOf('Bearer') == -1) token = "Bearer "+token;
     req.headers.authorization = token;
     return module.exports.auth(req, res, next);
