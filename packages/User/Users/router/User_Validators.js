@@ -1,0 +1,1 @@
+MDLWS.userMDLW = MDLWS.userMDLW || controllers.userMDLW(models);
